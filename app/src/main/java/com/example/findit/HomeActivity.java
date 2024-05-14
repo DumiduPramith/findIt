@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -61,6 +60,12 @@ public class HomeActivity extends AppCompatActivity {
                 editor.apply();
             }
         });
+
+        SharedPreferences sharedPreferences = getSharedPreferences("shared_prefs", MODE_PRIVATE);
+        boolean isRingOn = sharedPreferences.getBoolean("ring", false);
+        boolean isLocationOn = sharedPreferences.getBoolean("location", false);
+        ringSwitch.setChecked(isRingOn);
+        locationSwitch.setChecked(isLocationOn);
 
     }
 }
