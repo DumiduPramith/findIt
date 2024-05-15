@@ -1,18 +1,17 @@
 package com.example.findit;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_RECEIVE_PERMISSION_CODE = 0;
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handlePermissionGranted(requestCode);
         } else {
-            Toast.makeText(this, "Need to Grant "+ getPermissionName(requestCode), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Need to Grant " + getPermissionName(requestCode), Toast.LENGTH_LONG).show();
             new Handler().postDelayed(() -> finish(), 2000);
         }
     }
@@ -90,14 +89,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void runActivity(){
+    public void runActivity() {
         new Handler().postDelayed(() -> {
-            SharedPreferences sharedPreferences = getSharedPreferences("shared_prefs", MODE_PRIVATE);
-            if (sharedPreferences.contains("phone")) {
-                startActivity(new Intent(MainActivity.this, HomeActivity.class));
-            } else {
-                startActivity(new Intent(MainActivity.this, AddPhoneNumberActivity.class));
-            }
+//            SharedPreferences sharedPreferences = getSharedPreferences("shared_prefs", MODE_PRIVATE);
+//            if (sharedPreferences.contains("phone")) {
+//                startActivity(new Intent(MainActivity.this, HomeActivity.class));
+//            } else {
+//                startActivity(new Intent(MainActivity.this, AddPhoneNumberActivity.class));
+//            }
+//            finish();
+            Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(loginIntent);
             finish();
         }, 3000);
     }

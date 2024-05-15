@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,6 +15,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
@@ -24,15 +26,19 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 public class SmsReceiver extends BroadcastReceiver {
+    private static Ringtone ringtone;
+    private static CountDownTimer countdownTimer;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (context.checkCallingOrSelfPermission("android.permission.BROADCAST_SMS") == PackageManager.PERMISSION_GRANTED) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE);
+        if (context.checkCallingOrSelfPermission("android.permission.RECEIVE_SMS") == PackageManager.PERMISSION_GRANTED) {
             // Your existing code
             if (intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
                 for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                     String messageBody = smsMessage.getMessageBody();
                     String sender = smsMessage.getDisplayOriginatingAddress();
-                    if (messageBody.toLowerCase().contains("track")) {
+                    if (messageBody.toLowerCase().contains("track") && sharedPreferences.getBoolean("location", false)) {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
                             if (locationManager != null) {
@@ -65,17 +71,20 @@ public class SmsReceiver extends BroadcastReceiver {
                                     }
 
                                     @Override
-                                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+                                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                                    }
 
                                     @Override
-                                    public void onProviderEnabled(String provider) {}
+                                    public void onProviderEnabled(String provider) {
+                                    }
 
                                     @Override
-                                    public void onProviderDisabled(String provider) {}
+                                    public void onProviderDisabled(String provider) {
+                                    }
                                 }, null);
                             }
                         }
-                    } else if (messageBody.toLowerCase().contains("ring")) {
+                    } else if (messageBody.toLowerCase().contains("ring") && sharedPreferences.getBoolean("ring", false)) {
                         Toast.makeText(context, "Ringing the phone", Toast.LENGTH_LONG).show();
                         try {
                             AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -87,8 +96,22 @@ public class SmsReceiver extends BroadcastReceiver {
                             }
 
                             Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                            Ringtone ringtone = RingtoneManager.getRingtone(context, ringtoneUri);
-                            ringtone.play();
+                            ringtone = RingtoneManager.getRingtone(context, ringtoneUri);
+
+                            final int[] count = {0};
+                            countdownTimer = new CountDownTimer(60000, 1000) {
+                                public void onTick(long millisUntilFinished) {
+                                    if (!ringtone.isPlaying() && count[0] < 3) {
+                                        Toast.makeText(context, "Ringing the phone", Toast.LENGTH_LONG).show();
+                                        ringtone.play();
+                                        count[0]++;
+                                    }
+                                }
+
+                                public void onFinish() {
+                                    ringtone.stop();
+                                }
+                            }.start();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -99,5 +122,14 @@ public class SmsReceiver extends BroadcastReceiver {
             // Log a warning or throw a SecurityException
         }
 
+    }
+
+    public void stopRinging() {
+        if (ringtone != null && ringtone.isPlaying()) {
+            ringtone.stop();
+        }
+        if (countdownTimer != null) {
+            countdownTimer.cancel();
+        }
     }
 }
