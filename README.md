@@ -3,9 +3,9 @@
   Android App
 </h2>
 <div align="center">
-    <img alt="Demo" src="interfaces/welcome.png" width="30%" />
-    <img alt="Demo" src="interfaces/login.png" width="30%" />
-    <img alt="Demo" src="interfaces/home.png" width="30%" />
+    <img alt="Demo" src="Interfaces/welcome.png" width="30%" />
+    <img alt="Demo" src="Interfaces/login.png" width="30%" />
+    <img alt="Demo" src="Interfaces/home.png" width="30%" />
 </div>
 
 <br/>
