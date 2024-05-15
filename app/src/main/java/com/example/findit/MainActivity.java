@@ -91,13 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void runActivity() {
         new Handler().postDelayed(() -> {
-//            SharedPreferences sharedPreferences = getSharedPreferences("shared_prefs", MODE_PRIVATE);
-//            if (sharedPreferences.contains("phone")) {
-//                startActivity(new Intent(MainActivity.this, HomeActivity.class));
-//            } else {
-//                startActivity(new Intent(MainActivity.this, AddPhoneNumberActivity.class));
-//            }
-//            finish();
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(loginIntent);
             finish();
